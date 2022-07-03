@@ -8,6 +8,11 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const regexLink = /^(?:(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))$/i;
 const regexFull = /^(?<artist>.+?) +[-]{1} +(?<song>.+?)(?:(?: *[-]{1} *)(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))?$/i;
 
+// If Joac's server, use #test-channel, otherwise use #music-request
+const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "992224424776437840";
+// If Joac's server, use role "Joachim", otherwise use role "Staff"
+const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -15,10 +20,11 @@ client.on('ready', () => {
 client.login(process.env.CLIENT_TOKEN);
 
 client.on('messageCreate', async msg => {
-    if(msg.channel.id != "992448812054495253") return;  // Only act in the #test-channel channel // Only act in the #music-request channel
-    if(msg.author.bot) return;                          // Only act if the user is not a bot
     
-    if(!msg.member.roles.cache.has("969046767511429210")) msg.delete(); // Delete message if user does not have the "Joachim" role
+    if(msg.channel.id != channelToWorkIn) return;
+    if(msg.author.bot) return;
+    
+    if(!msg.member.roles.cache.has(roleToExclude)) msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
     
     const linkMatch = msg.content.match(regexLink);
     
@@ -82,7 +88,7 @@ client.on('messageCreate', async msg => {
 
             msg.delete();
         } else {    // If the user entered wrong input
-            if(!msg.member.roles.cache.has("969046767511429210")) {
+            if(!msg.member.roles.cache.has(roleToExclude)) {
                 msg.channel.send({
                     embeds: [{
                         title: "Invalid format. Use one of the following ways to request a song:",
