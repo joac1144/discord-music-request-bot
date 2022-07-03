@@ -23,8 +23,6 @@ client.on('messageCreate', async msg => {
     if(msg.channel.id != channelToWorkIn) return;
     if(msg.author.bot) return;
     
-    if(!msg.member.roles.cache.has(roleToExclude)) msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
-    
     const linkMatch = msg.content.match(regexLink);
     
     const authorAvatar = msg.author.avatar == null 
@@ -69,7 +67,7 @@ client.on('messageCreate', async msg => {
             });
         });
 
-        msg.delete();
+        msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
     } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
@@ -85,7 +83,7 @@ client.on('messageCreate', async msg => {
                 }]
             });
 
-            msg.delete();
+            msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
         } else {    // If the user entered wrong input
             if(!msg.member.roles.cache.has(roleToExclude)) {
                 msg.channel.send({
@@ -95,6 +93,8 @@ client.on('messageCreate', async msg => {
                     }]
                 }).then(message => setTimeout(() => message.delete(), 15000));    
             }
+
+            if(!msg.member.roles.cache.has(roleToExclude)) msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
         }
     }
 });
