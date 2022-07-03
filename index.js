@@ -8,11 +8,6 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const regexLink = /^(?:(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))$/i;
 const regexFull = /^(?<artist>.+?) +[-]{1} +(?<song>.+?)(?:(?: *[-]{1} *)(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))?$/i;
 
-// If Joac's server, use #test-channel, otherwise use #music-request
-const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "992224424776437840";
-// If Joac's server, use role "Joachim", otherwise use role "Staff"
-const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
-
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -20,6 +15,10 @@ client.on('ready', () => {
 client.login(process.env.CLIENT_TOKEN);
 
 client.on('messageCreate', async msg => {
+    // If Joac's server, use #test-channel, otherwise use #music-request
+    const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "992224424776437840";
+    // If Joac's server, use role "Joachim", otherwise use role "Staff"
+    const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
     
     if(msg.channel.id != channelToWorkIn) return;
     if(msg.author.bot) return;
