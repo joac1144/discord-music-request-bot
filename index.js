@@ -18,7 +18,7 @@ client.on('messageCreate', async msg => {
     if(msg.channel.id != "992448812054495253") return;  // Only act in the #test-channel channel // Only act in the #music-request channel
     if(msg.author.bot) return;                          // Only act if the user is not a bot
     
-    if(!msg.member.roles.cache.has("969046767511429210")) msg.delete();
+    if(!msg.member.roles.cache.has("969046767511429210")) msg.delete(); // Delete message if user does not have the "Joachim" role
     
     const linkMatch = msg.content.match(regexLink);
     
@@ -26,25 +26,46 @@ client.on('messageCreate', async msg => {
     ? `https://cdn.discordapp.com/embed/avatars/${msg.author.discriminator % 5}.png`
     : `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}`;
     
-    if(linkMatch != null) {
+    if(linkMatch != null) {     // If the user entered only link
         await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${linkMatch.groups.videoid}&key=${process.env.YOUTUBE_API_KEY}&part=snippet`)
         .then(res => res.json())
         .then(out => {
             console.log({ input: linkMatch.input, groups: linkMatch.groups });
+
+            const regexVideoTitleOnlySongname = /^(?<song>(?:[a-z|A-Z| |0-9])+?)$/;
+
+            const originalTitle = out.items[0].snippet.title;
+            let videoTitle = originalTitle;
+            if(regexVideoTitleOnlySongname.test(originalTitle)) {
+                const regexVideoDescription = /(?<song>.+?) +[-|·]{1} +(?<artist>[^\n]+)/;
+
+                const matchVideoDescription = out.items[0].snippet.description.match(regexVideoDescription);
+                if(matchVideoDescription != null) {
+                    const artist = matchVideoDescription.groups.artist.replace(" · ", ", ");
+                    videoTitle = artist + " - " + matchVideoDescription.groups.song;
+                } else {
+                    videoTitle = originalTitle;
+                }
+            }
+
+            const regexVideoTitleOfficial = / {1}[\(|\[](Official(\w| )+?|(\w| )+? Video)[)|\]]/i;
+
+            videoTitle = videoTitle.replace(regexVideoTitleOfficial, "");
+
             msg.channel.send({
                 embeds: [{
                     author: {
                         name: msg.author.username + " requested",
                         icon_url: authorAvatar
                     },
-                    title: out.items[0].snippet.title,
+                    title: videoTitle,
                     url: linkMatch.groups.link
                 }]
             });
         });
 
         msg.delete();
-    } else {
+    } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
             console.log({ input: match.input, groups: match.groups });
@@ -60,7 +81,7 @@ client.on('messageCreate', async msg => {
             });
 
             msg.delete();
-        } else {
+        } else {    // If the user entered wrong input
             if(!msg.member.roles.cache.has("969046767511429210")) {
                 msg.channel.send({
                     embeds: [{
