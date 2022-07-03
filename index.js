@@ -9,26 +9,28 @@ const regexLink = /^(?:(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>
 const regexFull = /^(?<artist>.+?) +[-]{1} +(?<song>.+?)(?:(?: *[-]{1} *)(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))?$/i;
 
 client.on('ready', () => {
- console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.login(process.env.CLIENT_TOKEN);
 
 client.on('messageCreate', async msg => {
-    if(msg.author.bot) return;
+    if(msg.channel.id != "992448812054495253") return;  // Only act in the #test-channel channel // Only act in the #music-request channel
+    if(msg.author.bot) return;                          // Only act if the user is not a bot
+    
+    if(!msg.member.roles.cache.has("969046767511429210")) msg.delete();
     
     const linkMatch = msg.content.match(regexLink);
-
+    
     const authorAvatar = msg.author.avatar == null 
-                        ? `https://cdn.discordapp.com/embed/avatars/${msg.author.discriminator % 5}.png`
-                        : `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}`;
-
+    ? `https://cdn.discordapp.com/embed/avatars/${msg.author.discriminator % 5}.png`
+    : `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}`;
+    
     if(linkMatch != null) {
         await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${linkMatch.groups.videoid}&key=${process.env.YOUTUBE_API_KEY}&part=snippet`)
         .then(res => res.json())
         .then(out => {
             console.log({ input: linkMatch.input, groups: linkMatch.groups });
-    
             msg.channel.send({
                 embeds: [{
                     author: {
@@ -38,25 +40,35 @@ client.on('messageCreate', async msg => {
                     title: out.items[0].snippet.title,
                     url: linkMatch.groups.link
                 }]
-            })
+            });
         });
+
+        msg.delete();
     } else {
         const match = msg.content.match(regexFull);
-        if(match == null) return;
-        
-        console.log({ input: match.input, groups: match.groups });
-        
-        msg.channel.send({
-            embeds: [{
-                author: {
-                    name: msg.author.username + " requested",
-                    icon_url: authorAvatar
-                },
-                title: match.groups.artist + " - " + match.groups.song,
-                url: match.groups.link
-            }]
-        })
-    }
+        if(match != null) {
+            console.log({ input: match.input, groups: match.groups });
+            msg.channel.send({
+                embeds: [{
+                    author: {
+                        name: msg.author.username + " requested",
+                        icon_url: authorAvatar
+                    },
+                    title: match.groups.artist + " - " + match.groups.song,
+                    url: match.groups.link
+                }]
+            });
 
-    /* if(!msg.member.permissions.has("Joachim")) */ msg.delete();
+            msg.delete();
+        } else {
+            if(!msg.member.roles.cache.has("969046767511429210")) {
+                msg.channel.send({
+                    embeds: [{
+                        title: "Invalid format. Use one of the following ways to request a song:",
+                        description: "[artist] - [song]\n[artist] - [song] - [link]\n[link]\n\nFor examples, see the pinned message."
+                    }]
+                }).then(message => setTimeout(() => message.delete(), 15000));    
+            }
+        }
+    }
 });
