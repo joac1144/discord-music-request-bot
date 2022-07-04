@@ -16,7 +16,7 @@ client.login(process.env.CLIENT_TOKEN);
 
 client.on('messageCreate', async msg => {
     // If Joac's server, use #test-channel, otherwise use #music-request
-    const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "992224424776437840";
+    const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "971498236076490783";
     // If Joac's server, use role "Joachim", otherwise use role "Staff"
     const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
     const albinaRole = "896304369451012147";
@@ -87,7 +87,7 @@ client.on('messageCreate', async msg => {
             msg.delete();
         } else {    // If the user entered wrong input
             if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
-                                msg.channel.send({
+                msg.channel.send({
                     embeds: [{
                         title: "Invalid format. Use one of the following ways to request a song:",
                         description: "[artist] - [song]\n[artist] - [song] - [link]\n[link]\n\nFor examples, see the pinned message."
