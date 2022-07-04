@@ -34,6 +34,7 @@ client.on('messageCreate', async msg => {
         await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${linkMatch.groups.videoid}&key=${process.env.YOUTUBE_API_KEY}&part=snippet`)
         .then(res => res.json())
         .then(out => {
+            console.log("Suceesful input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
             console.log({ input: linkMatch.input, groups: linkMatch.groups });
 
             const regexVideoTitleOnlySongname = /^(?<song>(?:[a-z|A-Z| |0-9])+?)$/;
@@ -72,6 +73,7 @@ client.on('messageCreate', async msg => {
     } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
+            console.log("Suceesful input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
             console.log({ input: match.input, groups: match.groups });
             msg.channel.send({
                 embeds: [{
@@ -86,7 +88,8 @@ client.on('messageCreate', async msg => {
 
             msg.delete();
         } else {    // If the user entered wrong input
-            console.log("Invalid input by " + msg.author.username + ": ", { input: msg.content });
+            console.log("Invalid input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
+            console.log({ input: msg.content });
             if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
                 msg.channel.send({
                     embeds: [{
