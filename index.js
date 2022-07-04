@@ -19,6 +19,7 @@ client.on('messageCreate', async msg => {
     const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "992224424776437840";
     // If Joac's server, use role "Joachim", otherwise use role "Staff"
     const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
+    const albinaRole = "896304369451012147";
     
     if(msg.channel.id != channelToWorkIn) return;
     if(msg.author.bot) return;
@@ -67,7 +68,7 @@ client.on('messageCreate', async msg => {
             });
         });
 
-        msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
+        msg.delete();
     } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
@@ -83,18 +84,18 @@ client.on('messageCreate', async msg => {
                 }]
             });
 
-            msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
+            msg.delete();
         } else {    // If the user entered wrong input
-            if(!msg.member.roles.cache.has(roleToExclude)) {
-                msg.channel.send({
+            if(!msg.member.roles.cache.has(roleToExclude) || !msg.member.roles.cache.has(albinaRole)) {
+                                msg.channel.send({
                     embeds: [{
                         title: "Invalid format. Use one of the following ways to request a song:",
                         description: "[artist] - [song]\n[artist] - [song] - [link]\n[link]\n\nFor examples, see the pinned message."
                     }]
-                }).then(message => setTimeout(() => message.delete(), 15000));    
-            }
+                }).then(message => setTimeout(() => message.delete(), 15000));
 
-            if(!msg.member.roles.cache.has(roleToExclude)) msg.delete(); // Delete message if user does not have the "Joachim"/"Staff" role
+                msg.delete();   // Delete message if user does not have the "Joachim"/"Staff"/"Albina" role
+            }
         }
     }
 });
