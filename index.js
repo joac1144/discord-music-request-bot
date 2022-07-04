@@ -27,8 +27,8 @@ client.on('messageCreate', async msg => {
     const linkMatch = msg.content.match(regexLink);
     
     const authorAvatar = msg.author.avatar == null 
-    ? `https://cdn.discordapp.com/embed/avatars/${msg.author.discriminator % 5}.png`
-    : `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}`;
+                            ? `https://cdn.discordapp.com/embed/avatars/${msg.author.discriminator % 5}.png`
+                            : `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}`;
     
     if(linkMatch != null) {     // If the user entered only link
         await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${linkMatch.groups.videoid}&key=${process.env.YOUTUBE_API_KEY}&part=snippet`)
@@ -86,11 +86,12 @@ client.on('messageCreate', async msg => {
 
             msg.delete();
         } else {    // If the user entered wrong input
+            console.log("Invalid input by " + msg.author + { input: msg.content });
             if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
                 msg.channel.send({
                     embeds: [{
                         title: "Invalid format. Use one of the following ways to request a song:",
-                        description: "[artist] - [song]\n[artist] - [song] - [link]\n[link]\n\nFor examples, see the pinned message."
+                        description: "[link]\n[artist] - [song] - [link]\n[artist] - [song]\n\nFor examples, see the pinned message."
                     }]
                 }).then(message => setTimeout(() => message.delete(), 15000));
 
