@@ -86,7 +86,7 @@ client.on('messageCreate', async msg => {
 
             msg.delete();
         } else {    // If the user entered wrong input
-            console.log("Invalid input by " + msg.author + { input: msg.content });
+            console.log("Invalid input by " + msg.author.username + ": ", { input: msg.content });
             if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
                 msg.channel.send({
                     embeds: [{
