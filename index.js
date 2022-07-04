@@ -86,7 +86,7 @@ client.on('messageCreate', async msg => {
 
             msg.delete();
         } else {    // If the user entered wrong input
-            if(!msg.member.roles.cache.has(roleToExclude) || !msg.member.roles.cache.has(albinaRole)) {
+            if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
                                 msg.channel.send({
                     embeds: [{
                         title: "Invalid format. Use one of the following ways to request a song:",
