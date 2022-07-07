@@ -53,7 +53,7 @@ client.on('messageCreate', async msg => {
                 }
             }
 
-            const regexVideoTitleOfficial = / {1}[\(|\[](Official(\w| )+?|(\w| )+? Video)[)|\]]/i;
+            const regexVideoTitleOfficial = / {1}[\(|\[](Official(\w| )*?|(\w| )*? Video|(\w| )*?Audio)[)|\]]/i;
 
             videoTitle = videoTitle.replace(regexVideoTitleOfficial, "");
 
