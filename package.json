@@ -1,7 +1,7 @@
 {
-  "name": "test-bot",
-  "version": "1.0.0",
-  "description": "test bot for Discord",
+  "name": "discord-music-request-bot",
+  "version": "2.0.1",
+  "description": "Music request bot for Discord",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

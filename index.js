@@ -5,8 +5,14 @@ const fetch = require('node-fetch');
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
+const joacServerId = "908856175049736202";
+const testChannelId = "992448812054495253";
+const musicRequestChannelId = "971498236076490783";
 const regexLink = /^(?:(?<link>(?:https:\/\/www\.youtube\.com\/watch\?v=|https:\/\/youtu.be\/)(?<videoid>.*)))$/i;
 const regexFull = /^(?<artist>.+?) +- +(?<song>.+?)(?: *- +?(?<link>.*))?$/i;
+const joachimRole = "969046767511429210";
+const staffRole = "896304904421916723";
+const albinaRole = "896304369451012147";
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -15,11 +21,8 @@ client.on('ready', () => {
 client.login(process.env.CLIENT_TOKEN);
 
 client.on('messageCreate', async msg => {
-    // If Joac's server, use #test-channel, otherwise use #music-request
-    const channelToWorkIn = msg.guild.id == "908856175049736202" ? "992448812054495253" : "971498236076490783";
-    // If Joac's server, use role "Joachim", otherwise use role "Staff"
-    const roleToExclude = msg.guild.id == "908856175049736202" ? "969046767511429210" : "896304904421916723";
-    const albinaRole = "896304369451012147";
+    const channelToWorkIn = msg.guild.id == joacServerId ? testChannelId : musicRequestChannelId;
+    const roleToExclude = msg.guild.id == joacServerId ? joachimRole : staffRole;
     
     if(msg.channel.id != channelToWorkIn) return;
     if(msg.author.bot) return;
@@ -90,13 +93,12 @@ client.on('messageCreate', async msg => {
             else {
                 console.log("Invalid link used in input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
                 console.log({ input: msg.content });
-                if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
-                    msg.channel.send({
-                        embeds: [{
-                            title: "Invalid link. Only YouTube links are accepted."
-                        }]
-                    }).then(message => setTimeout(() => message.delete(), 10000));
-                }
+                
+                msg.channel.send({
+                    embeds: [{
+                        title: "Invalid link. Only YouTube links are accepted."
+                    }]
+                }).then(message => setTimeout(() => message.delete(), 10000));
             }
 
             msg.delete();
