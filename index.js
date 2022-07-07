@@ -5,8 +5,8 @@ const fetch = require('node-fetch');
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
-const regexLink = /^(?:(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))$/i;
-const regexFull = /^(?<artist>.+?) +[-]{1} +(?<song>.+?)(?:(?: *[-]{1} *)(?<link>https:\/\/www\.youtube\.com\/watch\?v=(?<videoid>.*)))?$/i;
+const regexLink = /^(?:(?<link>(?:https:\/\/www\.youtube\.com\/watch\?v=|https:\/\/youtu.be\/)(?<videoid>.*)))$/i;
+const regexFull = /^(?<artist>.+?) +- +(?<song>.+?)(?: *- +?(?<link>.*))?$/i;
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -73,21 +73,35 @@ client.on('messageCreate', async msg => {
     } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
-            console.log("Successful input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
-            console.log({ input: match.input, groups: match.groups });
-            msg.channel.send({
-                embeds: [{
-                    author: {
-                        name: msg.author.username + " requested",
-                        icon_url: authorAvatar
-                    },
-                    title: match.groups.artist + " - " + match.groups.song,
-                    url: match.groups.link
-                }]
-            });
+            if(match.groups.link.test(regexLink)) {
+                console.log("Successful input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
+                console.log({ input: match.input, groups: match.groups });
+                msg.channel.send({
+                    embeds: [{
+                        author: {
+                            name: msg.author.username + " requested",
+                            icon_url: authorAvatar
+                        },
+                        title: match.groups.artist + " - " + match.groups.song,
+                        url: match.groups.link
+                    }]
+                });
+            }
+            else {
+                console.log("Invalid link used in input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
+                console.log({ input: msg.content });
+                if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
+                    msg.channel.send({
+                        embeds: [{
+                            title: "Invalid link. Only YouTube links are accepted."
+                        }]
+                    }).then(message => setTimeout(() => message.delete(), 10000));
+                }
+            }
 
             msg.delete();
-        } else {    // If the user entered wrong input
+        } 
+        else {    // If the user entered wrong input
             console.log("Invalid input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
             console.log({ input: msg.content });
             if(!msg.member.roles.cache.has(roleToExclude) && !msg.member.roles.cache.has(albinaRole)) {
