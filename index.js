@@ -73,7 +73,7 @@ client.on('messageCreate', async msg => {
     } else {    // If the user entered artist and song (and maybe link)
         const match = msg.content.match(regexFull);
         if(match != null) {
-            if(match.groups.link.test(regexLink)) {
+            if(regexLink.test(match.groups.link)) {
                 console.log("Successful input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
                 console.log({ input: match.input, groups: match.groups });
                 msg.channel.send({
@@ -100,7 +100,7 @@ client.on('messageCreate', async msg => {
             }
 
             msg.delete();
-        } 
+        }
         else {    // If the user entered wrong input
             console.log("Invalid input by " + msg.author.username + "#" + msg.author.discriminator + ": ");
             console.log({ input: msg.content });
