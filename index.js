@@ -1,9 +1,13 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 
-// Discord.js versions ^13.0 require us to explicitly define client intents
 const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ 
+    intents: [
+        Intents.FLAGS.GUILDS, 
+        Intents.FLAGS.GUILD_MESSAGES
+    ] 
+});
 
 const joacServerId = "908856175049736202";
 const testChannelId = "992448812054495253";
