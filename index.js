@@ -24,7 +24,7 @@ client.on('ready', () => {
 
 client.login(process.env.CLIENT_TOKEN);
 
-client.on('messageCreate', async msg => {
+client.on('messageCreate', msg => {
     const channelToWorkIn = msg.guild.id == joacServerId ? testChannelId : musicRequestChannelId;
     const roleToExclude = msg.guild.id == joacServerId ? joachimRole : staffRole;
     
@@ -46,23 +46,15 @@ client.on('messageCreate', async msg => {
 
             const regexVideoTitleOnlySongname = /^(?<song>(?:[a-z|A-Z| |0-9])+?)$/;
 
-            const originalTitle = out.items[0].snippet.title;
-            let videoTitle = originalTitle;
-            if(regexVideoTitleOnlySongname.test(originalTitle)) {
-                const regexVideoDescription = /(?<song>.+?) +[-|·]{1} +(?<artist>[^\n]+)/;
+            let videoTitle = out.items[0].snippet.title;
 
-                const matchVideoDescription = out.items[0].snippet.description.match(regexVideoDescription);
+            if(regexVideoTitleOnlySongname.test(videoTitle)) {
+                const matchVideoDescription = out.items[0].snippet.description.match(/(?<song>.+?) +[-|·]{1} +(?<artist>[^\n]+)/);
                 if(matchVideoDescription != null) {
                     const artist = matchVideoDescription.groups.artist.replace(" · ", ", ");
                     videoTitle = artist + " - " + matchVideoDescription.groups.song;
-                } else {
-                    videoTitle = originalTitle;
                 }
-            }
-
-            const regexVideoTitleOfficial = / {1}[\(|\[](Official(\w| )*?|(\w| )*? Video|(\w| )*?Audio)[)|\]]/i;
-
-            videoTitle = videoTitle.replace(regexVideoTitleOfficial, "");
+            } else videoTitle = videoTitle.replace(/ {1}[\(|\[](Official(\w| )*?|(\w| )*? Video|(\w| )*?Audio)[)|\]]/i, "");    
 
             msg.channel.send({
                 embeds: [{
